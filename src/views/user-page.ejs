@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    table,
+    th,
+    td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    .button a {
+      text-decoration: none;
+    }
+  </style>
+  <body>
+    <table style="width: 100%; margin-top: 20px">
+      <tr>
+        <td>FirstName</td>
+        <td>LastName</td>
+        <td>Email</td>
+        <td>Address</td>
+        <td>Actions</td>
+      </tr>
+      <% for(var i=0; i < dataUsers.length; i++) { %>
+      <tr>
+        <td><%= dataUsers[i].firstName %></td>
+        <td><%= dataUsers[i].lastName %></td>
+        <td><%= dataUsers[i].email %></td>
+        <td><%= dataUsers[i].address %></td>
+        <td>
+          <button style="margin: 6px" class="button">
+            <a href="/edit-user?id=<%= dataUsers[i].id %>">Edit</a>
+          </button>
+          <button class="button">
+            <a href="/delete-user?id=<%= dataUsers[i].id %>">Delete</a>
+          </button>
+        </td>
+      </tr>
+      <% } %>
+    </table>
+  </body>
+</html>
