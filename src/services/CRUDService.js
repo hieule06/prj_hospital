@@ -56,6 +56,7 @@ const updateUser = async (dataUser) => {
     try {
       let dataUserUpdate = await db.User.findOne({
         where: { id: dataUser.id },
+        raw: false,
       });
       if (dataUserUpdate) {
         dataUserUpdate.firstName = dataUser.firstName;
@@ -80,11 +81,14 @@ const deleteUser = async (idUser) => {
         where: { id: idUser },
       });
       if (userDelete) {
-        await userDelete.destroy();
+        await db.User.destroy({ where: { id: idUser } });
         const AllUsers = await db.User.findAll();
         resolve(AllUsers);
       } else {
-        resolve(userDelete);
+        resolve({
+          errCode: 2,
+          errMessage: "The user isn't exist",
+        });
       }
     } catch (error) {
       reject(error);
