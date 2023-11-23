@@ -73,10 +73,20 @@ const handleUpdateUser = async (req, res) => {
   }
 };
 
+const handleGetAllCode = async (req, res) => {
+  try {
+    const dataAllCode = await userSevices.getAllCode(req.query.type);
+    return res.status(200).json({ dataAllCode });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   handleUserLogin,
   handleGetAllUsers,
   handleCreateNewUser,
   handleDeleteUser,
   handleUpdateUser,
+  handleGetAllCode,
 };

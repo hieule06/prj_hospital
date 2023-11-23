@@ -129,7 +129,6 @@ const updateUser = async (dataUser) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!dataUser.id) {
-        console.log("first: ", dataUser);
         resolve({
           errCode: 2,
           errMessage: "Missing required parameters",
@@ -143,7 +142,6 @@ const updateUser = async (dataUser) => {
           dataUserUpdate.firstName = dataUser.firstName;
           dataUserUpdate.lastName = dataUser.lastName;
           dataUserUpdate.address = dataUser.address;
-          console.log("first: ", dataUserUpdate);
           await dataUserUpdate.save();
           const AllUsers = await db.User.findAll();
           resolve({
@@ -162,6 +160,31 @@ const updateUser = async (dataUser) => {
     }
   });
 };
+const getAllCode = async (type) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let dataAllCode = await db.AllCode.findAll({
+        where: { type: type },
+        raw: false,
+      });
+      if (dataAllCode) {
+        resolve({
+          errCode: 0,
+          errMessage: "get data allcode success!",
+          data: dataAllCode,
+        });
+      } else {
+        resolve({
+          errCode: 2,
+          errMessage: "dataAllCode not found!",
+          data: dataAllCode,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 module.exports = {
   validateLogin,
@@ -169,4 +192,5 @@ module.exports = {
   createNewUser,
   deleteUser,
   updateUser,
+  getAllCode,
 };
