@@ -9,8 +9,8 @@ require("dotenv").config();
 let app = express();
 
 app.use(cors({ credentials: true, origin: true }));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extends: true }));
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extends: true }));
 
 viewEngine(app);
 initWebRoutes(app);

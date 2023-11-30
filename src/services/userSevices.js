@@ -87,9 +87,11 @@ const createNewUser = async (dataUser) => {
         firstName: dataUser.firstName,
         lastName: dataUser.lastName,
         address: dataUser.address,
-        gender: dataUser.gender === "1" ? true : false,
+        gender: dataUser.gender,
         phoneNumber: dataUser.phoneNumber,
+        positionId: dataUser.positionId,
         roleId: dataUser.roleId,
+        image: dataUser.avatar,
       });
       resolve({
         errCode: 0,
@@ -142,6 +144,11 @@ const updateUser = async (dataUser) => {
           dataUserUpdate.firstName = dataUser.firstName;
           dataUserUpdate.lastName = dataUser.lastName;
           dataUserUpdate.address = dataUser.address;
+          dataUserUpdate.phoneNumber = dataUser.phoneNumber;
+          dataUserUpdate.gender = dataUser.gender;
+          dataUserUpdate.roleId = dataUser.roleId;
+          dataUserUpdate.positionId = dataUser.positionId;
+          dataUserUpdate.image = dataUser.image;
           await dataUserUpdate.save();
           const AllUsers = await db.User.findAll();
           resolve({
