@@ -167,24 +167,24 @@ const updateUser = async (dataUser) => {
     }
   });
 };
-const getAllCode = async (type) => {
+const getRegulation = async (type) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let dataAllCode = await db.AllCode.findAll({
+      let dataRegulation = await db.Regulation.findAll({
         where: { type: type },
         raw: false,
       });
-      if (dataAllCode) {
+      if (dataRegulation) {
         resolve({
           errCode: 0,
-          errMessage: "get data allcode success!",
-          data: dataAllCode,
+          errMessage: "get data Regulation success!",
+          data: dataRegulation,
         });
       } else {
         resolve({
           errCode: 2,
-          errMessage: "dataAllCode not found!",
-          data: dataAllCode,
+          errMessage: "dataRegulation not found!",
+          data: dataRegulation,
         });
       }
     } catch (error) {
@@ -199,5 +199,5 @@ module.exports = {
   createNewUser,
   deleteUser,
   updateUser,
-  getAllCode,
+  getRegulation,
 };

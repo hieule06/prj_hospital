@@ -1,4 +1,4 @@
-import userSevices from "../services/userSevices";
+import userSevices from "../services/userServices";
 
 const handleUserLogin = async (req, res) => {
   try {
@@ -73,10 +73,10 @@ const handleUpdateUser = async (req, res) => {
   }
 };
 
-const handleGetAllCode = async (req, res) => {
+const handleGetRegulation = async (req, res) => {
   try {
-    const dataAllCode = await userSevices.getAllCode(req.query.type);
-    return res.status(200).json({ dataAllCode });
+    const dataRegulation = await userSevices.getRegulation(req.query.type);
+    return res.status(200).json({ dataRegulation });
   } catch (error) {
     console.log(error);
   }
@@ -88,5 +88,5 @@ module.exports = {
   handleCreateNewUser,
   handleDeleteUser,
   handleUpdateUser,
-  handleGetAllCode,
+  handleGetRegulation,
 };
