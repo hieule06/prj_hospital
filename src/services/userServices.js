@@ -195,6 +195,7 @@ const getRegulation = async (type) => {
 
 module.exports = {
   validateLogin,
+  checkEmail,
   getAllUsers,
   createNewUser,
   deleteUser,

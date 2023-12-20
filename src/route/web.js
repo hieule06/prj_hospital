@@ -22,6 +22,17 @@ let initWebRoutes = (app) => {
   router.get("/api/get-regulation", userController.handleGetRegulation);
 
   router.get("/api/get-data-doctors", doctorController.handleGetDataDoctors);
+  router.get("/api/get-all-doctors", doctorController.handleGetAllDoctors);
+  router.post(
+    "/api/create-infor-doctor",
+    doctorController.handleCreateInforDoctor
+  );
+  router.get("/api/get-infor-doctor", doctorController.handleGetDataDoctor);
+  router.post(
+    "/put-edit-infor-doctor",
+    doctorController.handleUpdateInforDoctor
+    );
+    router.get("/api/get-detail-doctor-by-id", doctorController.handleGetDataDoctorByID);
 
   return app.use("/", router);
 };

@@ -43,8 +43,15 @@ const handleGetAllUsers = async (req, res) => {
 const handleCreateNewUser = async (req, res) => {
   try {
     const dataUser = req.body;
-    const newUser = await userSevices.createNewUser(dataUser);
-    return res.status(200).json({ newUser });
+    const checkEmail = await userSevices.checkEmail(dataUser.email);
+    if (!checkEmail) {
+      const newUser = await userSevices.createNewUser(dataUser);
+      return res.status(200).json({ newUser });
+    } else {
+      return res
+        .status(200)
+        .json({ errCode: 1, errMessage: "Email already exists !" });
+    }
   } catch (error) {
     console.log(error);
   }
