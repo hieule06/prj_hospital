@@ -115,6 +115,38 @@ const handleGetDataDoctorByID = async (req, res) => {
   }
 };
 
+const handleBulkCreateSchedule = async (req, res) => {
+  try {
+    const dataListSchedule = req.body;
+    if (dataListSchedule) {
+      const result = await doctorServices.bulkCreateSchedule(dataListSchedule);
+      return res.status(200).json({ errCode: 0, errMessage: "ok!", result });
+    } else {
+      return res
+        .status(200)
+        .json({ errCode: 1, errMessage: "Missing inputs parameter !" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const handledataDoctorSchedule = async (req, res) => {
+  try {
+    const listParams = req.query;
+    if (listParams) {
+      const result = await doctorServices.getDataDoctorSchedule(listParams);
+      return res.status(200).json({ errCode: 0, errMessage: "ok!", result });
+    } else {
+      return res
+        .status(200)
+        .json({ errCode: 1, errMessage: "Missing inputs parameter !" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   handleGetDataDoctors,
   handleGetAllDoctors,
@@ -122,4 +154,6 @@ module.exports = {
   handleGetDataDoctor,
   handleUpdateInforDoctor,
   handleGetDataDoctorByID,
+  handleBulkCreateSchedule,
+  handledataDoctorSchedule,
 };

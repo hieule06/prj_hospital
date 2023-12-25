@@ -1,5 +1,10 @@
 import bcrypt from "bcryptjs";
 import db from "../models";
+import { differenceWith, intersectionWith } from "lodash";
+require("dotenv").config();
+const { Sequelize } = require("sequelize");
+
+let maxNumberSchedule = process.env.MAX_NUMBER_SCHEDULE || 10;
 
 const getDataDoctors = (limitCount) => {
   return new Promise(async (resolve, reject) => {
@@ -147,6 +152,111 @@ const GetDataDoctorByID = (idDoctor) => {
   });
 };
 
+const bulkCreateSchedule = (dataListSchedule) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log("dataListSchedule[0].date: ", dataListSchedule[0].date);
+      const dataDBSchedule = await db.Schedule.findAll({
+        where: {
+          doctorId: dataListSchedule[0].doctorId,
+          date: {
+            [Sequelize.Op.between]: [
+              new Date(dataListSchedule[0].date).setHours(0, 0, 0, 0),
+              new Date(dataListSchedule[0].date).setHours(23, 59, 59, 999),
+            ],
+          },
+        },
+        attributes: ["doctorId", "date", "timeType"],
+        raw: true,
+      });
+
+      // Kiểm tra trùng lặp time vs ngày và có quá số lượng bệnh nhân trong 1 khoảng time của bác sĩ hay không
+      if (dataDBSchedule && dataDBSchedule.length > 0) {
+        // list timeType được thêm
+        const listCreateSchedule = differenceWith(
+          dataListSchedule,
+          dataDBSchedule,
+          (a, b) => a.timeType === b.timeType
+        );
+
+        // list timeType bị xóa
+        const listDeleteSchedule = differenceWith(
+          dataDBSchedule,
+          dataListSchedule,
+          (a, b) => a.timeType === b.timeType
+        );
+        if (listCreateSchedule && listCreateSchedule.length > 0) {
+          console.log("listCreateSchedule: ", listCreateSchedule);
+          const dataCreateSchedule = listCreateSchedule.map((item) => {
+            return {
+              date: item.date,
+              timeType: item.timeType,
+              doctorId: item.doctorId,
+              maxNumber: maxNumberSchedule,
+            };
+          });
+          await db.Schedule.bulkCreate(dataCreateSchedule);
+        }
+        if (listDeleteSchedule && listDeleteSchedule.length > 0) {
+          const dataDeleteSchedule = listDeleteSchedule.map((item) => {
+            return item.timeType;
+          });
+          console.log("dataDeleteSchedule: ", dataDeleteSchedule);
+          await db.Schedule.destroy({
+            where: {
+              timeType: { [Sequelize.Op.in]: dataDeleteSchedule },
+            },
+          });
+        }
+      } else {
+        const dataCreateSchedule = dataListSchedule.map((item) => {
+          return {
+            date: item.date,
+            timeType: item.timeType,
+            doctorId: item.doctorId,
+            maxNumber: maxNumberSchedule,
+          };
+        });
+        await db.Schedule.bulkCreate(dataCreateSchedule);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getDataDoctorSchedule = (listParams) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log("listParams.dateSelect: ", Number(listParams.dateSelect));
+      const dataDBSchedule = await db.Schedule.findAll({
+        where: {
+          doctorId: listParams.idDoctor,
+          date: {
+            [Sequelize.Op.between]: [
+              new Date(Number(listParams.dateSelect)).setHours(0, 0, 0, 0),
+              new Date(Number(listParams.dateSelect)).setHours(23, 59, 59, 999),
+            ],
+          },
+        },
+        raw: true,
+      });
+      console.log("dataDBSchedule: ", dataDBSchedule);
+      // Kiểm tra trùng lặp time vs ngày và có quá số lượng bệnh nhân trong 1 khoảng time của bác sĩ hay không
+      if (dataDBSchedule && dataDBSchedule.length > 0) {
+        resolve(dataDBSchedule);
+      } else {
+        resolve({
+          errCode: 2,
+          errMessage: "Schedule data has not been set up yet !",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getDataDoctors,
   getAllDoctors,
@@ -154,4 +264,6 @@ module.exports = {
   getInforDoctor,
   updateInforDoctor,
   GetDataDoctorByID,
+  bulkCreateSchedule,
+  getDataDoctorSchedule,
 };
