@@ -68,6 +68,8 @@ const createInforDoctor = (dataInforDoctor) => {
         contentHTML: dataInforDoctor.contentHTML,
         contentMarkdown: dataInforDoctor.contentMarkDown,
         description: dataInforDoctor.descriptionDoctor,
+        priceType: dataInforDoctor.priceSelect,
+        noteText: dataInforDoctor.noteText,
         doctorId: dataInforDoctor.selectDoctor,
       });
       resolve({
@@ -109,6 +111,8 @@ const updateInforDoctor = (inforDoctor) => {
       (dataDoctorUpdate.contentHTML = inforDoctor.contentHTML),
         (dataDoctorUpdate.contentMarkdown = inforDoctor.contentMarkDown),
         (dataDoctorUpdate.description = inforDoctor.descriptionDoctor),
+        (dataDoctorUpdate.priceType = inforDoctor.priceSelect),
+        (dataDoctorUpdate.noteText = inforDoctor.noteText),
         (dataDoctorUpdate.doctorId = inforDoctor.selectDoctor),
         await dataDoctorUpdate.save();
       resolve({
@@ -130,7 +134,18 @@ const GetDataDoctorByID = (idDoctor) => {
         include: [
           {
             model: db.Markdown,
-            attributes: ["contentHTML", "contentMarkdown", "description"],
+            attributes: [
+              "contentHTML",
+              "contentMarkdown",
+              "description",
+              "priceType",
+              "noteText",
+            ],
+          },
+          {
+            model: db.Regulation,
+            as: "positionData",
+            attributes: ["valueEn", "valueVi"],
           },
         ],
         raw: false,
@@ -155,7 +170,6 @@ const GetDataDoctorByID = (idDoctor) => {
 const bulkCreateSchedule = (dataListSchedule) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("dataListSchedule[0].date: ", dataListSchedule[0].date);
       const dataDBSchedule = await db.Schedule.findAll({
         where: {
           doctorId: dataListSchedule[0].doctorId,
@@ -201,7 +215,6 @@ const bulkCreateSchedule = (dataListSchedule) => {
           const dataDeleteSchedule = listDeleteSchedule.map((item) => {
             return item.timeType;
           });
-          console.log("dataDeleteSchedule: ", dataDeleteSchedule);
           await db.Schedule.destroy({
             where: {
               timeType: { [Sequelize.Op.in]: dataDeleteSchedule },
@@ -228,7 +241,6 @@ const bulkCreateSchedule = (dataListSchedule) => {
 const getDataDoctorSchedule = (listParams) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("listParams.dateSelect: ", Number(listParams.dateSelect));
       const dataDBSchedule = await db.Schedule.findAll({
         where: {
           doctorId: listParams.idDoctor,
@@ -241,7 +253,6 @@ const getDataDoctorSchedule = (listParams) => {
         },
         raw: true,
       });
-      console.log("dataDBSchedule: ", dataDBSchedule);
       // Kiểm tra trùng lặp time vs ngày và có quá số lượng bệnh nhân trong 1 khoảng time của bác sĩ hay không
       if (dataDBSchedule && dataDBSchedule.length > 0) {
         resolve(dataDBSchedule);

@@ -30,7 +30,8 @@ module.exports = {
         type: Sequelize.STRING,
       },
       image: {
-        type: Sequelize.BLOB,
+        type: Sequelize.BLOB("long"),
+        allowNull: true,
       },
       positionId: {
         type: Sequelize.STRING,

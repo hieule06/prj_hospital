@@ -45,6 +45,7 @@ const handleCreateInforDoctor = async (req, res) => {
       dataInforDoctor.contentMarkDown &&
       dataInforDoctor.contentHTML &&
       dataInforDoctor.descriptionDoctor &&
+      dataInforDoctor.priceSelect &&
       dataInforDoctor.selectDoctor
     ) {
       const newInforDoctor = await doctorServices.createInforDoctor(
@@ -82,7 +83,14 @@ const handleGetDataDoctor = async (req, res) => {
 const handleUpdateInforDoctor = async (req, res) => {
   try {
     const inforDoctor = req.body;
-    if (inforDoctor) {
+    if (
+      inforDoctor &&
+      inforDoctor.contentMarkDown &&
+      inforDoctor.contentHTML &&
+      inforDoctor.descriptionDoctor &&
+      inforDoctor.priceSelect &&
+      inforDoctor.selectDoctor
+    ) {
       const updateInforDoctor = await doctorServices.updateInforDoctor(
         inforDoctor
       );
@@ -136,6 +144,9 @@ const handledataDoctorSchedule = async (req, res) => {
     const listParams = req.query;
     if (listParams) {
       const result = await doctorServices.getDataDoctorSchedule(listParams);
+      if (result && result.errCode === 2) {
+        return res.status(200).json({ ...result });
+      }
       return res.status(200).json({ errCode: 0, errMessage: "ok!", result });
     } else {
       return res
