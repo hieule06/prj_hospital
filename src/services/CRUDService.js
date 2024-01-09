@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import db from "../models";
+const { Sequelize } = require("sequelize");
 var salt = bcrypt.genSaltSync(10);
 
 const createNewUser = async (data) => {
@@ -26,7 +27,15 @@ const createNewUser = async (data) => {
 const getAllUsers = async () => {
   return new Promise(async (resolve, reject) => {
     try {
-      const dataUsers = await db.User.findAll({ raw: true });
+      const dataUsers = await db.User.findAll({
+        where: {
+          firstName: {
+            [Sequelize.Op.ne]: null,
+          },
+        },
+
+        raw: true,
+      });
       resolve(dataUsers);
     } catch (error) {
       reject(error);
@@ -63,7 +72,13 @@ const updateUser = async (dataUser) => {
         dataUserUpdate.lastName = dataUser.lastName;
         dataUserUpdate.address = dataUser.address;
         await dataUserUpdate.save();
-        const AllUsers = await db.User.findAll();
+        const AllUsers = await db.User.findAll({
+          where: {
+            firstName: {
+              [Sequelize.Op.ne]: null,
+            },
+          },
+        });
         resolve(AllUsers);
       } else {
         resolve();
@@ -82,7 +97,13 @@ const deleteUser = async (idUser) => {
       });
       if (userDelete) {
         await db.User.destroy({ where: { id: idUser } });
-        const AllUsers = await db.User.findAll();
+        const AllUsers = await db.User.findAll({
+          where: {
+            firstName: {
+              [Sequelize.Op.ne]: null,
+            },
+          },
+        });
         resolve(AllUsers);
       } else {
         resolve({

@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import db from "../models";
+const { Sequelize } = require("sequelize");
 var salt = bcrypt.genSaltSync(10);
 
 const validateLogin = (email, password) => {
@@ -57,6 +58,11 @@ const getAllUsers = (userId) => {
 
       if (userId === "All") {
         user = await db.User.findAll({
+          where: {
+            firstName: {
+              [Sequelize.Op.ne]: null,
+            },
+          },
           attributes: {
             exclude: ["password"],
           },
@@ -150,7 +156,13 @@ const updateUser = async (dataUser) => {
           dataUserUpdate.positionId = dataUser.positionId;
           dataUserUpdate.image = dataUser.image;
           await dataUserUpdate.save();
-          const AllUsers = await db.User.findAll();
+          const AllUsers = await db.User.findAll({
+            where: {
+              firstName: {
+                [Sequelize.Op.ne]: null,
+              },
+            },
+          });
           resolve({
             errCode: 0,
             errMessage: "Update success!",

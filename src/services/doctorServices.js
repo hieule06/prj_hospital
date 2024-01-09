@@ -1,4 +1,3 @@
-import bcrypt from "bcryptjs";
 import db from "../models";
 import { differenceWith, intersectionWith } from "lodash";
 require("dotenv").config();
@@ -11,7 +10,12 @@ const getDataDoctors = (limitCount) => {
     try {
       const user = await db.User.findAll({
         limit: limitCount,
-        where: { roleId: "R2" },
+        where: {
+          firstName: {
+            [Sequelize.Op.ne]: null,
+          },
+          roleId: "R2",
+        },
         order: [["createdAt", "DESC"]],
         attributes: { exclude: ["password"] },
         include: [
@@ -44,7 +48,12 @@ const getAllDoctors = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const user = await db.User.findAll({
-        where: { roleId: "R2" },
+        where: {
+          firstName: {
+            [Sequelize.Op.ne]: null,
+          },
+          roleId: "R2",
+        },
         order: [["createdAt", "DESC"]],
         attributes: { exclude: ["password", "image"] },
         raw: true,
@@ -200,7 +209,6 @@ const bulkCreateSchedule = (dataListSchedule) => {
           (a, b) => a.timeType === b.timeType
         );
         if (listCreateSchedule && listCreateSchedule.length > 0) {
-          console.log("listCreateSchedule: ", listCreateSchedule);
           const dataCreateSchedule = listCreateSchedule.map((item) => {
             return {
               date: item.date,
