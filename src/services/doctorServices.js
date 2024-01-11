@@ -73,11 +73,12 @@ const getAllDoctors = () => {
 const createInforDoctor = (dataInforDoctor) => {
   return new Promise(async (resolve, reject) => {
     try {
-      await db.Markdown.create({
+      await db.Infor_Doctor.create({
         contentHTML: dataInforDoctor.contentHTML,
         contentMarkdown: dataInforDoctor.contentMarkDown,
         description: dataInforDoctor.descriptionDoctor,
         priceType: dataInforDoctor.priceSelect,
+        specialtyId: dataInforDoctor.specialtySelect,
         noteText: dataInforDoctor.noteText,
         doctorId: dataInforDoctor.selectDoctor,
       });
@@ -94,7 +95,7 @@ const createInforDoctor = (dataInforDoctor) => {
 const getInforDoctor = (idDoctor) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const inforDoctor = await db.Markdown.findOne({
+      const inforDoctor = await db.Infor_Doctor.findOne({
         where: { doctorId: idDoctor },
         raw: true,
       });
@@ -112,7 +113,7 @@ const getInforDoctor = (idDoctor) => {
 const updateInforDoctor = (inforDoctor) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let dataDoctorUpdate = await db.Markdown.findOne({
+      let dataDoctorUpdate = await db.Infor_Doctor.findOne({
         where: { doctorId: inforDoctor.selectDoctor },
         raw: false,
       });
@@ -121,6 +122,7 @@ const updateInforDoctor = (inforDoctor) => {
         (dataDoctorUpdate.contentMarkdown = inforDoctor.contentMarkDown),
         (dataDoctorUpdate.description = inforDoctor.descriptionDoctor),
         (dataDoctorUpdate.priceType = inforDoctor.priceSelect),
+        (dataDoctorUpdate.specialtyId = inforDoctor.specialtySelect),
         (dataDoctorUpdate.noteText = inforDoctor.noteText),
         (dataDoctorUpdate.doctorId = inforDoctor.selectDoctor),
         await dataDoctorUpdate.save();
@@ -142,12 +144,13 @@ const GetDataDoctorByID = (idDoctor) => {
         attributes: { exclude: ["password"] },
         include: [
           {
-            model: db.Markdown,
+            model: db.Infor_Doctor,
             attributes: [
               "contentHTML",
               "contentMarkdown",
               "description",
               "priceType",
+              "specialtyId",
               "noteText",
             ],
           },
@@ -167,6 +170,60 @@ const GetDataDoctorByID = (idDoctor) => {
       }
       if (dataDoctor) {
         resolve(dataDoctor);
+      } else {
+        resolve(false);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const GetDataDoctorByIDSpecialty = (idSpecialty) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const listDataDoctors = await db.Infor_Doctor.findAll({
+        where: { specialtyId: idSpecialty },
+        include: [
+          {
+            model: db.User,
+            attributes: [
+              "firstName",
+              "lastName",
+              "address",
+              "email",
+              "password",
+              "gender",
+              "phoneNumber",
+              "positionId",
+              "image",
+              "roleId",
+            ],
+            include: [
+              {
+                model: db.Infor_Doctor,
+                attributes: [
+                  "contentHTML",
+                  "contentMarkdown",
+                  "description",
+                  "priceType",
+                  "specialtyId",
+                  "noteText",
+                ],
+              },
+              {
+                model: db.Regulation,
+                as: "positionData",
+                attributes: ["valueEn", "valueVi"],
+              },
+            ],
+          },
+        ],
+        raw: false,
+        nest: true,
+      });
+      if (listDataDoctors) {
+        resolve(listDataDoctors);
       } else {
         resolve(false);
       }
@@ -276,6 +333,141 @@ const getDataDoctorSchedule = (listParams) => {
   });
 };
 
+// Specialty page
+
+const createNewSpecialty = (dataSpecialty) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await db.Specialty.create({
+        name: dataSpecialty.nameSpecialty,
+        descriptionHTML: dataSpecialty.descriptionHTML,
+        descriptionMarkdown: dataSpecialty.descriptionMarkdown,
+        image: dataSpecialty.imgSpecialty,
+      });
+      resolve({
+        errCode: 0,
+        errMessage: "Created new user success !",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const updateDataSpecialty = (dataSpecialty) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let dataSpecialtyUpdate = await db.Specialty.findOne({
+        where: { name: dataSpecialty.nameSpecialty },
+        raw: false,
+      });
+
+      (dataSpecialtyUpdate.descriptionHTML = dataSpecialty.descriptionHTML),
+        (dataSpecialtyUpdate.descriptionMarkdown =
+          dataSpecialty.descriptionMarkdown),
+        (dataSpecialtyUpdate.image = dataSpecialty.imgSpecialty),
+        await dataSpecialtyUpdate.save();
+      resolve({
+        errCode: 0,
+        errMessage: "Update information user success !",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getDataSpecialties = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const dataSpecialty = await db.Specialty.findAll();
+      if (dataSpecialty) {
+        resolve(dataSpecialty);
+      } else {
+        resolve(false);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const GetDataSpecialtyByID = (idSpecialty) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const dataSpecialty = await db.Specialty.findOne({
+        where: { id: idSpecialty },
+      });
+      if (dataSpecialty) {
+        resolve(dataSpecialty);
+      } else {
+        resolve(false);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+// Handbook page
+
+const createNewHandbook = (dataHandbook) => {
+  return new Promise(async (resolve, reject) => {
+    console.log("123: ", dataHandbook);
+    try {
+      await db.Handbook.create({
+        nameHandbook: dataHandbook.nameHandbook,
+        descriptionHTML: dataHandbook.descriptionHTML,
+        descriptionMarkdown: dataHandbook.descriptionMarkdown,
+        imageHandbook: dataHandbook.imgHandbook,
+      });
+      resolve({
+        errCode: 0,
+        errMessage: "Created new user success !",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const updateDataHandbook = (dataHandbook) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let dataHandbookUpdate = await db.Handbook.findOne({
+        where: { nameHandbook: dataHandbook.nameHandbook },
+        raw: false,
+      });
+
+      (dataHandbookUpdate.descriptionHTML = dataHandbook.descriptionHTML),
+        (dataHandbookUpdate.descriptionMarkdown =
+          dataHandbook.descriptionMarkdown),
+        (dataHandbookUpdate.imageHandbook = dataHandbook.imgHandbook),
+        await dataHandbookUpdate.save();
+      resolve({
+        errCode: 0,
+        errMessage: "Update information user success !",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getDataHandbook = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const dataHandbook = await db.Handbook.findAll();
+      if (dataHandbook) {
+        resolve(dataHandbook);
+      } else {
+        resolve(false);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 module.exports = {
   getDataDoctors,
   getAllDoctors,
@@ -283,6 +475,14 @@ module.exports = {
   getInforDoctor,
   updateInforDoctor,
   GetDataDoctorByID,
+  GetDataDoctorByIDSpecialty,
   bulkCreateSchedule,
   getDataDoctorSchedule,
+  createNewSpecialty,
+  updateDataSpecialty,
+  getDataSpecialties,
+  GetDataSpecialtyByID,
+  createNewHandbook,
+  updateDataHandbook,
+  getDataHandbook,
 };

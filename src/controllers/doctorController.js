@@ -89,7 +89,8 @@ const handleUpdateInforDoctor = async (req, res) => {
       inforDoctor.contentHTML &&
       inforDoctor.descriptionDoctor &&
       inforDoctor.priceSelect &&
-      inforDoctor.selectDoctor
+      inforDoctor.selectDoctor &&
+      inforDoctor.specialtySelect
     ) {
       const updateInforDoctor = await doctorServices.updateInforDoctor(
         inforDoctor
@@ -113,6 +114,26 @@ const handleGetDataDoctorByID = async (req, res) => {
       return res
         .status(200)
         .json({ errCode: 0, errMessage: "ok!", dataDoctor });
+    } else {
+      return res
+        .status(200)
+        .json({ errCode: 1, errMessage: "Missing inputs parameter !" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const handleGetDataDoctorByIDSpecialty = async (req, res) => {
+  try {
+    const idSpecialty = req.query.idSpecialty;
+    if (idSpecialty) {
+      const listDoctors = await doctorServices.GetDataDoctorByIDSpecialty(
+        idSpecialty
+      );
+      return res
+        .status(200)
+        .json({ errCode: 0, errMessage: "ok!", listDoctors });
     } else {
       return res
         .status(200)
@@ -158,6 +179,163 @@ const handledataDoctorSchedule = async (req, res) => {
   }
 };
 
+//Specialty page
+
+const handleCreateSpecialty = async (req, res) => {
+  try {
+    const dataSpecialty = req.body;
+    if (
+      dataSpecialty &&
+      dataSpecialty.nameSpecialty &&
+      dataSpecialty.descriptionHTML &&
+      dataSpecialty.descriptionMarkdown &&
+      dataSpecialty.imgSpecialty
+    ) {
+      const newSpecialty = await doctorServices.createNewSpecialty(
+        dataSpecialty
+      );
+      return res.status(200).json({ newSpecialty });
+    } else {
+      return res
+        .status(200)
+        .json({ errCode: 1, errMessage: "Missing inputs parameter !" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const handleUpdateSpecialty = async (req, res) => {
+  try {
+    const dataSpecialty = req.body;
+    if (
+      dataSpecialty &&
+      dataSpecialty.nameSpecialty &&
+      dataSpecialty.descriptionHTML &&
+      dataSpecialty.descriptionMarkdown &&
+      dataSpecialty.imgSpecialty
+    ) {
+      const updateSpecialty = await doctorServices.updateDataSpecialty(
+        dataSpecialty
+      );
+      return res.status(200).json({ updateSpecialty });
+    } else {
+      return res
+        .status(200)
+        .json({ errCode: 1, errMessage: "Missing inputs parameter !" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const handleGetAllSpecialty = async (req, res) => {
+  try {
+    let AllSpecialty = await doctorServices.getDataSpecialties();
+    if (AllSpecialty) {
+      return res.status(200).json({
+        errCode: 0,
+        errMessage: "ok!",
+        AllSpecialty,
+      });
+    } else {
+      return res.status(200).json({
+        errCode: 1,
+        errMessage: "Missing inputs parameter!",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const handleGetDataSpecialtyByID = async (req, res) => {
+  try {
+    const idSpecialty = req.query.id;
+    if (idSpecialty) {
+      const dataSpecialty = await doctorServices.GetDataSpecialtyByID(
+        idSpecialty
+      );
+      return res
+        .status(200)
+        .json({ errCode: 0, errMessage: "ok!", dataSpecialty });
+    } else {
+      return res
+        .status(200)
+        .json({ errCode: 1, errMessage: "Missing inputs parameter !" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// Handbook page
+
+const handleCreateHandbook = async (req, res) => {
+  try {
+    const dataHandbook = req.body;
+    if (
+      dataHandbook &&
+      dataHandbook.nameHandbook &&
+      dataHandbook.descriptionHTML &&
+      dataHandbook.descriptionMarkdown &&
+      dataHandbook.imgHandbook
+    ) {
+      const newHandbook = await doctorServices.createNewHandbook(dataHandbook);
+      return res.status(200).json({ newHandbook });
+    } else {
+      return res
+        .status(200)
+        .json({ errCode: 1, errMessage: "Missing inputs parameter !" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const handleUpdateHandbook = async (req, res) => {
+  try {
+    const dataHandbook = req.body;
+    if (
+      dataHandbook &&
+      dataHandbook.nameHandbook &&
+      dataHandbook.descriptionHTML &&
+      dataHandbook.descriptionMarkdown &&
+      dataHandbook.imgHandbook
+    ) {
+      const updateHandbook = await doctorServices.updateDataHandbook(
+        dataHandbook
+      );
+      return res.status(200).json({ updateHandbook });
+    } else {
+      return res
+        .status(200)
+        .json({ errCode: 1, errMessage: "Missing inputs parameter !" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const handleGetAllHandbook = async (req, res) => {
+  try {
+    let AllHandbook = await doctorServices.getDataSpecialties();
+    if (AllHandbook) {
+      return res.status(200).json({
+        errCode: 0,
+        errMessage: "ok!",
+        AllHandbook,
+      });
+    } else {
+      return res.status(200).json({
+        errCode: 1,
+        errMessage: "Missing inputs parameter!",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   handleGetDataDoctors,
   handleGetAllDoctors,
@@ -165,6 +343,14 @@ module.exports = {
   handleGetDataDoctor,
   handleUpdateInforDoctor,
   handleGetDataDoctorByID,
+  handleGetDataDoctorByIDSpecialty,
   handleBulkCreateSchedule,
   handledataDoctorSchedule,
+  handleCreateSpecialty,
+  handleUpdateSpecialty,
+  handleGetAllSpecialty,
+  handleGetDataSpecialtyByID,
+  handleCreateHandbook,
+  handleUpdateHandbook,
+  handleGetAllHandbook,
 };
