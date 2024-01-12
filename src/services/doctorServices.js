@@ -182,46 +182,86 @@ const GetDataDoctorByID = (idDoctor) => {
 const GetDataDoctorByIDSpecialty = (idSpecialty) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const listDataDoctors = await db.Infor_Doctor.findAll({
-        where: { specialtyId: idSpecialty },
-        include: [
-          {
-            model: db.User,
-            attributes: [
-              "firstName",
-              "lastName",
-              "address",
-              "email",
-              "password",
-              "gender",
-              "phoneNumber",
-              "positionId",
-              "image",
-              "roleId",
-            ],
-            include: [
-              {
-                model: db.Infor_Doctor,
-                attributes: [
-                  "contentHTML",
-                  "contentMarkdown",
-                  "description",
-                  "priceType",
-                  "specialtyId",
-                  "noteText",
-                ],
-              },
-              {
-                model: db.Regulation,
-                as: "positionData",
-                attributes: ["valueEn", "valueVi"],
-              },
-            ],
-          },
-        ],
-        raw: false,
-        nest: true,
-      });
+      const listDataDoctors =
+        idSpecialty === "All"
+          ? await db.Infor_Doctor.findAll({
+              include: [
+                {
+                  model: db.User,
+                  attributes: [
+                    "firstName",
+                    "lastName",
+                    "address",
+                    "email",
+                    "password",
+                    "gender",
+                    "phoneNumber",
+                    "positionId",
+                    "image",
+                    "roleId",
+                  ],
+                  include: [
+                    {
+                      model: db.Infor_Doctor,
+                      attributes: [
+                        "contentHTML",
+                        "contentMarkdown",
+                        "description",
+                        "priceType",
+                        "specialtyId",
+                        "noteText",
+                      ],
+                    },
+                    {
+                      model: db.Regulation,
+                      as: "positionData",
+                      attributes: ["valueEn", "valueVi"],
+                    },
+                  ],
+                },
+              ],
+              raw: false,
+              nest: true,
+            })
+          : await db.Infor_Doctor.findAll({
+              where: { specialtyId: idSpecialty },
+              include: [
+                {
+                  model: db.User,
+                  attributes: [
+                    "firstName",
+                    "lastName",
+                    "address",
+                    "email",
+                    "gender",
+                    "phoneNumber",
+                    "positionId",
+                    "image",
+                    "roleId",
+                  ],
+                  include: [
+                    {
+                      model: db.Infor_Doctor,
+                      attributes: [
+                        "contentHTML",
+                        "contentMarkdown",
+                        "description",
+                        "priceType",
+                        "specialtyId",
+                        "noteText",
+                      ],
+                    },
+                    {
+                      model: db.Regulation,
+                      as: "positionData",
+                      attributes: ["valueEn", "valueVi"],
+                    },
+                  ],
+                },
+              ],
+              raw: false,
+              nest: true,
+            });
       if (listDataDoctors) {
         resolve(listDataDoctors);
       } else {
@@ -468,6 +508,24 @@ const getDataHandbook = () => {
     }
   });
 };
+
+const GetDataHandbookByID = (idHandbook) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const dataHandbook = await db.Handbook.findOne({
+        where: { id: idHandbook },
+      });
+      if (dataHandbook) {
+        resolve(dataHandbook);
+      } else {
+        resolve(false);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getDataDoctors,
   getAllDoctors,
@@ -485,4 +543,5 @@ module.exports = {
   createNewHandbook,
   updateDataHandbook,
   getDataHandbook,
+  GetDataHandbookByID,
 };

@@ -76,8 +76,6 @@ let initWebRoutes = (app) => {
     doctorController.handleGetAllSpecialty
   );
 
-  router.get("/api/get-all-specialties", doctorController.handleGetAllHandbook);
-
   router.get(
     "/api/get-detail-specialty-by-id",
     doctorController.handleGetDataSpecialtyByID
@@ -92,6 +90,25 @@ let initWebRoutes = (app) => {
   router.post(
     "/api/update-data-handbook",
     doctorController.handleUpdateHandbook
+  );
+
+  router.get("/api/get-all-handbook", doctorController.handleGetAllHandbook);
+
+  router.get(
+    "/api/get-detail-handbook-by-id",
+    doctorController.handleGetDataHandbookByID
+  );
+
+  // Patient Manage
+
+  router.get(
+    "/api/get-data-booking-by-date",
+    patientController.handleGetDataBookingByDate
+  );
+
+  router.post(
+    "/api/update-status-booking",
+    patientController.handleUpdateStatusBooking
   );
 
   return app.use("/", router);

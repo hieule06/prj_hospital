@@ -319,7 +319,7 @@ const handleUpdateHandbook = async (req, res) => {
 
 const handleGetAllHandbook = async (req, res) => {
   try {
-    let AllHandbook = await doctorServices.getDataSpecialties();
+    let AllHandbook = await doctorServices.getDataHandbook();
     if (AllHandbook) {
       return res.status(200).json({
         errCode: 0,
@@ -336,6 +336,25 @@ const handleGetAllHandbook = async (req, res) => {
     console.log(error);
   }
 };
+
+const handleGetDataHandbookByID = async (req, res) => {
+  try {
+    const idHandbook = req.query.id;
+    if (idHandbook) {
+      const dataHandbook = await doctorServices.GetDataHandbookByID(idHandbook);
+      return res
+        .status(200)
+        .json({ errCode: 0, errMessage: "ok!", dataHandbook });
+    } else {
+      return res
+        .status(200)
+        .json({ errCode: 1, errMessage: "Missing inputs parameter !" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   handleGetDataDoctors,
   handleGetAllDoctors,
@@ -353,4 +372,5 @@ module.exports = {
   handleCreateHandbook,
   handleUpdateHandbook,
   handleGetAllHandbook,
+  handleGetDataHandbookByID,
 };

@@ -20,7 +20,11 @@ const patientAppointment = (data) => {
       const user = await db.User.findOrCreate({
         where: { email: data.email },
         defaults: {
+          lastName: data.patientName,
           email: data.email,
+          address: data.address,
+          phoneNumber: data.phoneNumber,
+          gender: data.gender,
           roleId: "R3",
         },
       });
@@ -48,7 +52,7 @@ const patientAppointment = (data) => {
       }
 
       if (booking && booking[1]) {
-        await emailService.sendEmailConfirm({
+        /* const resultSendEmail = await emailService.sendEmailConfirm({
           receiverEmail: data.email,
           scheduleTimeFrame: data.scheduleTimeFrame,
           doctorName: data.doctorName,
@@ -58,7 +62,7 @@ const patientAppointment = (data) => {
           reason: data.reason,
           redireactLink: buidUrlEmail(data.doctorId, token),
           language: data.language,
-        });
+        }); */
       }
       resolve(booking);
     } catch (error) {
@@ -85,12 +89,33 @@ let postVerifyBookAppoinment = (data) => {
           raw: false,
         });
         if (appoinment) {
-          appoinment.statusId = "S2";
-          await appoinment.save();
-          resolve({
-            errCode: 0,
-            errMessage: "Update the appoinment success!",
+          const checkNumberBooking = await db.Booking.findAll({
+            where: {
+              doctorId: appoinment.doctorId,
+              date: {
+                [Sequelize.Op.between]: [
+                  new Date(Number(appoinment.date)).setHours(0, 0, 0, 0),
+                  new Date(Number(appoinment.date)).setHours(23, 59, 59, 999),
+                ],
+              },
+              timeType: appoinment.timeType,
+            },
+            raw: false,
           });
+          if (checkNumberBooking.length <= 10) {
+            appoinment.statusId = "S2";
+            await appoinment.save();
+            resolve({
+              errCode: 0,
+              errMessage: "Update the appoinment success!",
+            });
+          } else {
+            resolve({
+              errCode: 3,
+              errMessage:
+                "Examination schedule is full, please allow another time!",
+            });
+          }
         } else {
           resolve({
             errCode: 2,
@@ -104,7 +129,126 @@ let postVerifyBookAppoinment = (data) => {
   });
 };
 
+// Patient manage
+
+const getDataBookingByDate = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let dataBooking;
+      if (data.idDoctor === "all") {
+        dataBooking = await db.Booking.findAll({
+          where: {
+            date: {
+              [Sequelize.Op.between]: [
+                new Date(Number(data.date)).setHours(0, 0, 0, 0),
+                new Date(Number(data.date)).setHours(23, 59, 59, 999),
+              ],
+            },
+            statusId: {
+              [Sequelize.Op.or]: ["S2", "S3"],
+            },
+          },
+          include: [
+            {
+              model: db.User,
+              as: "patientData",
+              attributes: [
+                "lastName",
+                "address",
+                "email",
+                "gender",
+                "phoneNumber",
+                "roleId",
+              ],
+            },
+          ],
+          raw: false,
+          nest: true,
+        });
+      } else {
+        dataBooking = await db.Booking.findAll({
+          where: {
+            date: {
+              [Sequelize.Op.between]: [
+                new Date(Number(data.date)).setHours(0, 0, 0, 0),
+                new Date(Number(data.date)).setHours(23, 59, 59, 999),
+              ],
+            },
+            statusId: {
+              [Sequelize.Op.or]: ["S2", "S3"],
+            },
+            doctorId: data.idDoctor,
+          },
+          include: [
+            {
+              model: db.User,
+              as: "patientData",
+              attributes: [
+                "lastName",
+                "address",
+                "email",
+                "gender",
+                "phoneNumber",
+                "roleId",
+              ],
+            },
+          ],
+          raw: false,
+          nest: true,
+        });
+      }
+
+      if (dataBooking) {
+        resolve(dataBooking);
+      } else {
+        resolve(false);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let updateStatusBooking = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.token || !data.doctorId) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+      } else {
+        let appoinment = await db.Booking.findOne({
+          where: {
+            doctorId: data.doctorId,
+            token: data.token,
+            statusId: data.statusBefore,
+          },
+          raw: false,
+        });
+        if (appoinment) {
+          appoinment.statusId = data.statusAfter;
+          await appoinment.save();
+          resolve({
+            errCode: 0,
+            errMessage: "Update the status-booking is success!",
+          });
+        } else {
+          resolve({
+            errCode: 2,
+            errMessage: "update error !",
+          });
+        }
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 module.exports = {
   patientAppointment,
   postVerifyBookAppoinment,
+  getDataBookingByDate,
+  updateStatusBooking,
 };
