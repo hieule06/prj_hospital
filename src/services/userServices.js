@@ -62,6 +62,7 @@ const getAllUsers = (userId) => {
             firstName: {
               [Sequelize.Op.ne]: null,
             },
+            roleId: { [Sequelize.Op.ne]: "R3" },
           },
           attributes: {
             exclude: ["password"],
@@ -147,14 +148,20 @@ const updateUser = async (dataUser) => {
           raw: false,
         });
         if (dataUserUpdate) {
-          dataUserUpdate.firstName = dataUser.firstName;
-          dataUserUpdate.lastName = dataUser.lastName;
-          dataUserUpdate.address = dataUser.address;
-          dataUserUpdate.phoneNumber = dataUser.phoneNumber;
-          dataUserUpdate.gender = dataUser.gender;
-          dataUserUpdate.roleId = dataUser.roleId;
-          dataUserUpdate.positionId = dataUser.positionId;
-          dataUserUpdate.image = dataUser.image;
+          dataUserUpdate.firstName = dataUser.firstName
+            ? dataUser.firstName
+            : "";
+          dataUserUpdate.lastName = dataUser.lastName ? dataUser.lastName : "";
+          dataUserUpdate.address = dataUser.address ? dataUser.address : "";
+          dataUserUpdate.phoneNumber = dataUser.phoneNumber
+            ? dataUser.phoneNumber
+            : "";
+          dataUserUpdate.gender = dataUser.gender ? dataUser.gender : "";
+          dataUserUpdate.roleId = dataUser.roleId ? dataUser.roleId : "";
+          dataUserUpdate.positionId = dataUser.positionId
+            ? dataUser.positionId
+            : "";
+          dataUserUpdate.image = dataUser.image ? dataUser.image : "";
           await dataUserUpdate.save();
           const AllUsers = await db.User.findAll({
             where: {
@@ -179,6 +186,34 @@ const updateUser = async (dataUser) => {
     }
   });
 };
+
+const checkPatientMainLogin = async (idPatient) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let result = await db.Booking.findOne({
+        where: { patientsId: idPatient, statusId: "S4" },
+        raw: false,
+      });
+      if (result) {
+        resolve({
+          errCode: 0,
+          errMessage:
+            "The patient has already scheduled a medical examination !",
+          data: result,
+        });
+      } else {
+        resolve({
+          errCode: 1,
+          errMessage: "The patient has never scheduled a medical examination !",
+          data: result,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 const getRegulation = async (type) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -212,5 +247,6 @@ module.exports = {
   createNewUser,
   deleteUser,
   updateUser,
+  checkPatientMainLogin,
   getRegulation,
 };

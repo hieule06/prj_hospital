@@ -4,6 +4,8 @@ import userController from "../controllers/userController";
 import doctorController from "../controllers/doctorController";
 import patientController from "../controllers/patientController";
 
+const PDFDocument = require("pdfkit");
+
 let router = express.Router();
 
 let initWebRoutes = (app) => {
@@ -21,6 +23,7 @@ let initWebRoutes = (app) => {
   router.post("/api/put-edit-user", userController.handleUpdateUser);
   router.get("/api/delete-user", userController.handleDeleteUser);
   router.get("/api/get-regulation", userController.handleGetRegulation);
+  router.get("/api/patient-main-login", userController.handlePatientLogin);
 
   router.get("/api/get-data-doctors", doctorController.handleGetDataDoctors);
   router.get("/api/get-all-doctors", doctorController.handleGetAllDoctors);
@@ -72,6 +75,11 @@ let initWebRoutes = (app) => {
   );
 
   router.get(
+    "/api/delete-data-specialty-by-idSpecialty",
+    doctorController.handleDeleteSpecialty
+  );
+
+  router.get(
     "/api/get-all-specialties",
     doctorController.handleGetAllSpecialty
   );
@@ -92,6 +100,11 @@ let initWebRoutes = (app) => {
     doctorController.handleUpdateHandbook
   );
 
+  router.get(
+    "/api/delete-data-handbook-by-idHandbook",
+    doctorController.handleDeleteHandbook
+  );
+
   router.get("/api/get-all-handbook", doctorController.handleGetAllHandbook);
 
   router.get(
@@ -110,6 +123,71 @@ let initWebRoutes = (app) => {
     "/api/update-status-booking",
     patientController.handleUpdateStatusBooking
   );
+
+  router.post("/api/delete-bookings", patientController.handleDeleteBookings);
+
+  router.get(
+    "/api/get-all-booking-had-patients",
+    patientController.handleGetAllBookingHadPatients
+  );
+
+  router.get("/api/get-all-patients", patientController.handleGetAllPatients);
+
+  router.post("/api/history-patient", patientController.handleHistoryPatient);
+
+  // History
+  router.get(
+    "/api/get-history-patient-by-idPatient",
+    patientController.handleGetHistoryPatientByIdPatient
+  );
+
+  // Re-Examination
+  router.post(
+    "/api/create-booking-re-examination",
+    patientController.handleCreateBookingReExamination
+  );
+
+  router.get(
+    "/api/booking-re-examination",
+    patientController.handleGetBookingReExamination
+  );
+
+  // Send email for all patients re-examination
+  router.post(
+    "/api/send-email-re-examination",
+    patientController.handleSendEmailReExamination
+  );
+
+  // router.get("/generate-pdf", (req, res) => {
+  //   const { name } = res.body;
+
+  //   const stream = res.writeHead(200, {
+  //     "Content-Type": "application/pdf",
+  //     "Content-Disposition": `attachment;filename=invoice.pdf`,
+  //   });
+
+  //   const doc = new PDFDocument({ bufferPages: true, font: "Courier" });
+
+  //   doc.on("data", (chunk) => stream.write(chunk));
+  //   doc.on("end", () => stream.end());
+
+  //   doc.fontSize(20).text(`A heading`);
+
+  //   doc
+  //     .fontSize(12)
+  //     .text(
+  //       `Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores, saepe. ${name}`
+  //     );
+  //   doc.end();
+
+  //   /* const doc = new PDFDocument();
+  //   res.setHeader("Content-Type", "application/pdf");
+  //   res.setHeader("Content-Disposition", 'attachment; filename="output.pdf"');
+
+  //   doc.pipe(res);
+  //   doc.fontSize(20).text(`Xin chào, ${name}!`, 50, 50);
+  //   doc.end(); */
+  // });
 
   return app.use("/", router);
 };

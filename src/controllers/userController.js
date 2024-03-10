@@ -5,7 +5,7 @@ const handleUserLogin = async (req, res) => {
     let email = req.body.email;
     let password = req.body.password;
     if (!email || !password) {
-      return res.status(500).json({
+      return res.status(200).json({
         errCode: 1,
         errMessage: "Missing inputs parameter!",
       });
@@ -80,6 +80,16 @@ const handleUpdateUser = async (req, res) => {
   }
 };
 
+const handlePatientLogin = async (req, res) => {
+  try {
+    const idPatient = req.query.idPatient;
+    const result = await userSevices.checkPatientMainLogin(idPatient);
+    return res.status(200).json({ result });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const handleGetRegulation = async (req, res) => {
   try {
     const dataRegulation = await userSevices.getRegulation(req.query.type);
@@ -95,5 +105,6 @@ module.exports = {
   handleCreateNewUser,
   handleDeleteUser,
   handleUpdateUser,
+  handlePatientLogin,
   handleGetRegulation,
 };

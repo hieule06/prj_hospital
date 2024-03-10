@@ -417,6 +417,30 @@ const updateDataSpecialty = (dataSpecialty) => {
   });
 };
 
+const deleteDataSpecialty = (idSpecialty) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let specialtyDelete = await db.Specialty.findOne({
+        where: { id: idSpecialty },
+      });
+      if (specialtyDelete) {
+        await db.Specialty.destroy({ where: { id: idSpecialty } });
+        resolve({
+          errCode: 0,
+          errMessage: "Delete specialty success!",
+        });
+      } else {
+        resolve({
+          errCode: 2,
+          errMessage: "The specialty isn't exist",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 const getDataSpecialties = () => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -453,7 +477,6 @@ const GetDataSpecialtyByID = (idSpecialty) => {
 
 const createNewHandbook = (dataHandbook) => {
   return new Promise(async (resolve, reject) => {
-    console.log("123: ", dataHandbook);
     try {
       await db.Handbook.create({
         nameHandbook: dataHandbook.nameHandbook,
@@ -488,6 +511,30 @@ const updateDataHandbook = (dataHandbook) => {
         errCode: 0,
         errMessage: "Update information user success !",
       });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const deleteDataHandbook = (idHandbook) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let handbookDelete = await db.Handbook.findOne({
+        where: { id: idHandbook },
+      });
+      if (handbookDelete) {
+        await db.Handbook.destroy({ where: { id: idHandbook } });
+        resolve({
+          errCode: 0,
+          errMessage: "Delete handbook success!",
+        });
+      } else {
+        resolve({
+          errCode: 2,
+          errMessage: "The handbook isn't exist",
+        });
+      }
     } catch (error) {
       reject(error);
     }
@@ -538,10 +585,12 @@ module.exports = {
   getDataDoctorSchedule,
   createNewSpecialty,
   updateDataSpecialty,
+  deleteDataSpecialty,
   getDataSpecialties,
   GetDataSpecialtyByID,
   createNewHandbook,
   updateDataHandbook,
+  deleteDataHandbook,
   getDataHandbook,
   GetDataHandbookByID,
 };

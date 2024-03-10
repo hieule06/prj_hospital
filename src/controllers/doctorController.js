@@ -229,6 +229,24 @@ const handleUpdateSpecialty = async (req, res) => {
   }
 };
 
+const handleDeleteSpecialty = async (req, res) => {
+  try {
+    const idSpecialty = req.query.idSpecialty;
+    if (idSpecialty) {
+      const deleteSpecialty = await doctorServices.deleteDataSpecialty(
+        idSpecialty
+      );
+      return res.status(200).json({ deleteSpecialty });
+    } else {
+      return res
+        .status(200)
+        .json({ errCode: 1, errMessage: "Missing inputs parameter !" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const handleGetAllSpecialty = async (req, res) => {
   try {
     let AllSpecialty = await doctorServices.getDataSpecialties();
@@ -317,6 +335,24 @@ const handleUpdateHandbook = async (req, res) => {
   }
 };
 
+const handleDeleteHandbook = async (req, res) => {
+  try {
+    const idHandbook = req.query.idHandbook;
+    if (idHandbook) {
+      const deleteHandbook = await doctorServices.deleteDataHandbook(
+        idHandbook
+      );
+      return res.status(200).json({ deleteHandbook });
+    } else {
+      return res
+        .status(200)
+        .json({ errCode: 1, errMessage: "Missing inputs parameter !" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const handleGetAllHandbook = async (req, res) => {
   try {
     let AllHandbook = await doctorServices.getDataHandbook();
@@ -367,10 +403,12 @@ module.exports = {
   handledataDoctorSchedule,
   handleCreateSpecialty,
   handleUpdateSpecialty,
+  handleDeleteSpecialty,
   handleGetAllSpecialty,
   handleGetDataSpecialtyByID,
   handleCreateHandbook,
   handleUpdateHandbook,
+  handleDeleteHandbook,
   handleGetAllHandbook,
   handleGetDataHandbookByID,
 };
